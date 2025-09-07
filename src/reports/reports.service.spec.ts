@@ -24,10 +24,14 @@ describe('ReportsService', () => {
 
   it('should start async report generation', async () => {
     await service.generateAllAsync();
-    
+
     // Reports should be in processing state immediately
-    expect(['processing', 'idle'].includes(service.state('accounts'))).toBeTruthy();
-    expect(['processing', 'idle'].includes(service.state('yearly'))).toBeTruthy();
+    expect(
+      ['processing', 'idle'].includes(service.state('accounts')),
+    ).toBeTruthy();
+    expect(
+      ['processing', 'idle'].includes(service.state('yearly')),
+    ).toBeTruthy();
     expect(['processing', 'idle'].includes(service.state('fs'))).toBeTruthy();
   });
 

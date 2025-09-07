@@ -24,10 +24,10 @@ export class ReportsController {
   async generate() {
     // Start all reports in background and return immediately
     await this.reportsService.generateAllAsync();
-    return { 
+    return {
       message: 'Report generation started',
       status: 'processing',
-      checkStatusAt: '/api/v1/reports'
+      checkStatusAt: '/api/v1/reports',
     };
   }
 

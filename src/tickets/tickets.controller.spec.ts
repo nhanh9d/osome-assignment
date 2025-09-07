@@ -339,7 +339,7 @@ describe('TicketsController', () => {
           role: UserRole.corporateSecretary,
           companyId: company.id,
         });
-        const director = await User.create({
+        await User.create({
           name: 'Test Director',
           role: UserRole.director,
           companyId: company.id,
@@ -392,7 +392,7 @@ describe('TicketsController', () => {
           role: UserRole.accountant,
           companyId: company2.id,
         });
-        const director1 = await User.create({
+        await User.create({
           name: 'Director 1',
           role: UserRole.director,
           companyId: company1.id,
