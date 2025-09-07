@@ -33,6 +33,23 @@ export class TicketsController {
   async create(@Body() newTicketDto: newTicketDto) {
     const { type, companyId } = newTicketDto;
 
+    // Check for duplicate registrationAddressChange tickets
+    if (type === TicketType.registrationAddressChange) {
+      const existingTicket = await Ticket.findOne({
+        where: {
+          companyId,
+          type: TicketType.registrationAddressChange,
+          status: TicketStatus.open,
+        },
+      });
+
+      if (existingTicket) {
+        throw new ConflictException(
+          `Company already has an open registrationAddressChange ticket`,
+        );
+      }
+    }
+
     const category =
       type === TicketType.managementReport
         ? TicketCategory.accounting
@@ -43,10 +60,28 @@ export class TicketsController {
         ? UserRole.accountant
         : UserRole.corporateSecretary;
 
-    const assignees = await User.findAll({
+    let assignees = await User.findAll({
       where: { companyId, role: userRole },
       order: [['createdAt', 'DESC']],
     });
+
+    // For registrationAddressChange, if no corporate secretary, try Director
+    if (type === TicketType.registrationAddressChange && !assignees.length) {
+      const directors = await User.findAll({
+        where: { companyId, role: UserRole.director },
+        order: [['createdAt', 'DESC']],
+      });
+
+      if (directors.length > 1) {
+        throw new ConflictException(
+          `Multiple users with role director. Cannot create a ticket`,
+        );
+      }
+
+      if (directors.length === 1) {
+        assignees = directors;
+      }
+    }
 
     if (!assignees.length)
       throw new ConflictException(
